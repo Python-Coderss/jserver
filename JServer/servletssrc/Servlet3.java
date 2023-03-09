@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import com.fazecast.jSerialComm.*;
 
+
 import jserver.Config;
 import jserver.Servlet;
 
@@ -41,7 +42,7 @@ public class Servlet3 implements Servlet {
 	public boolean serv(String url) {
 		// TODO Auto-generated method stub
 		//System.out.println("resv3: " + url);
-		int itemp = url.compareTo("/micro ");
+		int itemp = url.compareTo("/set ");
 		//System.out.println("Itemp3: " +itemp);
 		
 		boolean temp = itemp  == 0;
@@ -49,58 +50,49 @@ public class Servlet3 implements Servlet {
 		return temp;
 		
 	}
-
+	public String t(String n, String b) {
+    	String r = "";
+    	r += s(n);
+    	r += o(b);
+    	r += s("/" + n);
+    	return r;
+    }
+	public String t(String n, String b, String attr) {
+    	String r = "";
+    	r += s(n + attr);
+    	r += o(b);
+    	r += s("/" + n);
+    	return r;
+    }
+	public String s(String b) {
+    	return l("<" + b + ">");
+    }
+	public String o(String o) {
+    	return o;
+    }
+	public String l(String o) {
+    	return o + "\n";
+    }
+	public String Form(HtmlPageGen.Input... data) {
+		String res = "";
+		for (HtmlPageGen.Input i : data) {
+			res += t("label", i.label);
+			res += t("input", "", " type=\"" + i.type + "\" value=\"" + i.value + "\"");
+		}
+		return t("form", res);
+	}
 	@Override
 	public void service(InputStream in, OutputStream o, String Path, String[] headers, String ip, String body) {
 		//System.out.println("Servlet Served");
 		PrintStream out = new PrintStream(o);
-		out.println("Hello world");
+		new HtmlPageGen(out, "Set", t("h1", "Set Schedule") +
+				Form(new HtmlPageGen.Input(t("h1", "Schedule"), "text", ""), new HtmlPageGen.Input(t("h1", "Submit"), "submit", "")) + t("h1", "Servlet Specifaction Version: " + 
+						servletSpec + "<br>Server Version: " + 
+						version + "<br>Request ip: " + 
+						ip + "<br>JserialCommVersion: " + 
+						SerialPort.getVersion())
+				);
 		
-		SerialPort[] ports = SerialPort.getCommPorts();
-		
-		SerialPort microbit = ports[0];
-		
-		for (SerialPort port: ports) {
-			out.println("System port name : " + port.getSystemPortName() + "<br>");
-			out.println("Descriptive port name : " + port.getDescriptivePortName() + "<br>");
-			out.println("Port description : " + port.getPortDescription() + "<br>");
-			out.println("is microbit : " + port.getPortDescription().equals("mbed Serial Port") + "<br>");
-			microbit = port;
-		}
-		microbit.setBaudRate(9600);
-		microbit.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 1000, 1000);
-		if (microbit.openPort(500)) {
-		InputStream inm = microbit.getInputStreamWithSuppressedTimeoutExceptions();
-		
-		OutputStream oum = microbit.getOutputStream();
-		
-		
-		
-		try {
-			oum.write('\n');
-			
-			
-			
-			
-			while(microbit.bytesAvailable() < 1) ;
-			
-			
-				int i = inm.read();
-		        while (!((i == '/') || (i == -1))) {
-		        	o.write(i);
-		        	while(microbit.bytesAvailable() < 1) ;
-		        	i =  inm.read();
-		        	
-		        }
-		         
-		}  catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		microbit.closePort();
-		
-		} else out.println("Could not open port in valid config");
-		out.println("Servlet Specifaction Version: " + servletSpec + "<br>Server Version: " + version + "<br>Request ip: " + ip + "<br>JserialCommVersion: " + SerialPort.getVersion());
 	}
 
 	@Override

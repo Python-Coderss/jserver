@@ -241,8 +241,7 @@ public class Servlet404 implements Servlet {
 			
 		}
 			
-		if (res == null) return s404;
-		else return res;
+		return s404;
 	}
 
 	
