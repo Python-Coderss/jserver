@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Uploader</title>
+</head>
+
+<body>
+    <h2>File Upload Service</h2>
+
+
+    <input type="file" id="file">
+    <button id="upload">Upload</button>
+        <small id="status"></small>
+
+    <script>
+
+
+        const file = document.getElementById('file');
+        const upload = document.getElementById('upload');
+                const status = document.getElementById('status');
+
+        upload.addEventListener('click', () => {
+                        // set status to uploading
+                        status.innerHTML = 'uploading';
+
+            const fileReader = new FileReader();
+            fileReader.readAsArrayBuffer(file.files[0]);
+
+
+            fileReader.onload = (event) => {
+                console.log('Complete File read successfully!')
+            }
+			fileReader.onload = async (event) => {
+
+    const content = event.target.result;
+    const CHUNK_SIZE = 1000;
+    const totalChunks = event.target.result.byteLength / CHUNK_SIZE;
+
+    // generate a file name
+    const fileName = Math.random().toString(36).slice(-6) + file.files[0].name;
+
+
+    for (let chunk = 0; chunk < totalChunks + 1; chunk++) {
+        let CHUNK = content.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE)
+
+
+        await fetch('/upload?fileName=' + fileName, {
+                'method' : 'POST',
+                'headers' : {
+                    'content-type' : "application/octet-stream",
+                },
+                'body': CHUNK
+        })
+    }
+        status.innerHTML = 'uploaded!!!';
+}
+        });
+    </script>
+</body>
+</html>
